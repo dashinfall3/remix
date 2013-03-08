@@ -1,4 +1,7 @@
 before do
+<<<<<<< HEAD
+  @inspiration = Inspiration.find(1)
+=======
   @inspiration ||= "'What a beautiful day'"
   # session[:oauth] ||= {}
 
@@ -38,6 +41,7 @@ before do
   #     session[:user_id] = user.id
   #   end  
   # end
+>>>>>>> master
 end
 
 
@@ -45,17 +49,34 @@ get '/' do
   erb :index
 end
 
+get 'request' do
 
-get '/user/:id' do 
-  @user = User.find(params[:id])
+
+end
+
+get '/inspiration/:id' do 
+  @inspiration = Inspiration.find(params[:id])
+  session[:inspiration_id => params[:id]]
   erb :show_inspiration
 end
 
-post 'upload_image' do
-  @image = Image.create(parms[:image])
-
+post '/photos' do
+  photo = Photo.new
+  puts params
+  photo.representation = params[:image]
+  photo.save
+  @inspiration.photos << photo
+  redirect '/inspiration'
 end
 
+get '/inspiration' do 
+  puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+  @photos = @inspiration.photos
+  erb :voting_wall
+end
+
+<<<<<<< HEAD
+=======
 get "/request" do
   redirect request_token.authorize_url
 end
@@ -75,3 +96,4 @@ end
 delete '/signout' do
   session.clear
 end
+>>>>>>> master

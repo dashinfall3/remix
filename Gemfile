@@ -13,6 +13,11 @@ gem 'thin'
 gem 'activesupport'
 gem 'activerecord'
 
+gem 'mini_magick'
+
+gem 'carrierwave'
+
+
 gem 'rake'
 
 group :test do
