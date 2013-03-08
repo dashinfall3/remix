@@ -7,6 +7,7 @@ class CreateUsers < ActiveRecord::Migration
       t.string :access_token_secret
   		t.string :profile_image_url
   		t.integer :phone
+      t.string :email
   		t.timestamps
   	end
   end

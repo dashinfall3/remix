@@ -27,3 +27,5 @@ end
 
 gem 'oauth'
 gem 'twitter'
+
+gem 'pony'

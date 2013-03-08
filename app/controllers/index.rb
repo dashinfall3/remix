@@ -1,47 +1,5 @@
 before do
-<<<<<<< HEAD
-  @inspiration = Inspiration.find(1)
-=======
-  @inspiration ||= "'What a beautiful day'"
-  # session[:oauth] ||= {}
 
-  # host = request.host
-  # host << ":9292" if request.host == "localhost"
-
-  # consumer_key = "JbwM73HDpxHItZR75CJfw"       # what twitter.com/apps says   
-  # consumer_secret = "VMuiDSFELiwHvBf9KmarpYz4XINJuDurCNbOCvk3kE8" # shhhh, its a secret   
-
-  # @consumer = OAuth::Consumer.new(consumer_key, consumer_secret, :site => "https://api.twitter.com")
-
-  # # generate a request token for this user session if we haven't already
-  # request_token = session[:oauth][:request_token]   
-  # request_token_secret = session[:oauth][:request_token_secret]
-
-  # if request_token.nil? || request_token_secret.nil?
-  #   # new user? create a request token and stick it in their session
-  #   @request_token = @consumer.get_request_token(:oauth_callback => "http://#{host}/oauth")
-  #   session[:oauth][:request_token] = @request_token.token
-  #   session[:oauth][:request_token_secret] = @request_token.secret
-  # else
-  #   # we made this user's request token before, so recreate the object
-  #   @request_token = OAuth::RequestToken.new(@consumer, request_token, request_token_secret)
-  # end
-
-  # this is what we came here for...   
-  # access_token = session[:oauth][:access_token]   
-  # access_token_secret = session[:oauth][:access_token_secret]
-  # unless access_token.nil? || access_token_secret.nil?
-  #   # @access_token = OAuth::AccessToken.new(@consumer, access_token, access_token_secret)    
-  #   @client = Twitter::Client.new oauth_token: access_token, oauth_token_secret: access_token_secret     
-  #   if User.find_by_access_token(access_token) == nil
-  #     user = User.create(:access_token => access_token, :access_token_secret => access_token_secret)
-  #     session[:user_id] = user.id
-  #   else
-  #     user = User.find_by_access_token(access_token)
-  #     session[:user_id] = user.id
-  #   end  
-  # end
->>>>>>> master
 end
 
 
@@ -49,34 +7,54 @@ get '/' do
   erb :index
 end
 
-get 'request' do
 
 
-end
-
-get '/inspiration/:id' do 
+get '/inspirations/:id' do 
   @inspiration = Inspiration.find(params[:id])
   session[:inspiration_id => params[:id]]
+  @photos = @inspiration.photos
   erb :show_inspiration
 end
 
-post '/photos' do
+post '/inspirations/:id/photos' do
   photo = Photo.new
   puts params
   photo.representation = params[:image]
   photo.save
-  @inspiration.photos << photo
-  redirect '/inspiration'
+  inspiration = Inspiration.find(params[:id])
+  inspiration.photos << photo
+  redirect "/inspirations/#{inspiration.id}"
 end
 
-get '/inspiration' do 
-  puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-  @photos = @inspiration.photos
-  erb :voting_wall
+get '/create_inspiration' do
+  erb :create_inspiration
 end
 
-<<<<<<< HEAD
-=======
+post '/inspiration' do
+  inspiration = Inspiration.new(:content=> params[:content], :author_id => session[:user_id])
+  if inspiration.save
+    User.all.each do |user|
+      Pony.mail(
+        :to => user.email, 
+        :from => "Christophersell3@gmail.com", 
+        :subject => "inspiring!", 
+        :html_body => "This is your inspiration of the day: #{inspiration.content}. Post a picture <a href='http://0.0.0.0:9292/inspirations/#{inspiration.id}'>here</a>", 
+        :via => :smtp, 
+        :via_options => {
+          :address     => 'smtp.gmail.com',
+          :port     => '587',
+          :user_name     => 'inspireme3332@gmail.com',
+          :password => 'wowthatis',
+          :authentication     => :plain,           # :plain, :login, :cram_md5, no auth by default
+          :domain   => "0.0.0.0:9292"     # the HELO domain provided by the client to the server
+      })
+    end
+    erb :create_inspiration
+  else
+    erb :create_inspiration
+  end
+end
+
 get "/request" do
   redirect request_token.authorize_url
 end
@@ -90,10 +68,24 @@ get "/oauth" do
               :access_token_secret => secret
   session[:user_id] = user.id
 
-  redirect "/"
+  redirect "/signin"
+end
+
+get '/signin' do 
+  erb :signin
+end
+
+post '/signin' do
+  user = User.find(session[:user_id])
+  email = params[:email]
+  user.update_attribute(:email, email)
+  redirect "/users/#{user.id}"
 end
 
 delete '/signout' do
   session.clear
 end
->>>>>>> master
+
+get '/users/:id' do
+  erb :user_show
+end
