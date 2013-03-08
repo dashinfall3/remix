@@ -1,8 +1,8 @@
-<h1>Inspiration of the day</h1>
-  <h1>Inspiration of the day <%= @inspiration %></h1>
+  <h1>Inspiration of the day <%= @inspiration.content %></h1>
 
-  <form>
+  <form action='/photos' method='post' enctype='multipart/form-data'/>
+    <input type="file" name='image' id='photo'/>
+    
     <input type='submit' value='Submit photo' />
-
   </form>
 

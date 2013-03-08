@@ -1,0 +1,10 @@
+<div>
+  <h1>
+    These are the uploaded images
+  </h1>
+  <% @photos.each do |photo| %>
+
+  <img src='<%= photo.representation %>' height="300" width="300"/>
+  <% end %>
+
+</div>

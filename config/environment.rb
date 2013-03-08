@@ -15,6 +15,14 @@ require 'pg'
 require 'active_record'
 require 'logger'
 
+require 'mini_magick'
+
+require 'carrierwave'
+require 'carrierwave/orm/activerecord'
+
+require 'carrierwave/processing/mini_magick'
+
+
 require 'sinatra'
 require "sinatra/reloader" if development?
 
@@ -27,7 +35,13 @@ APP_NAME = APP_ROOT.basename.to_s
 
 # Set up the controllers and helpers
 Dir[APP_ROOT.join('app', 'controllers', '*.rb')].each { |file| require file }
+Dir[APP_ROOT.join('app', 'uploaders', '*.rb')].each { |file| require file }
 Dir[APP_ROOT.join('app', 'helpers', '*.rb')].each { |file| require file }
 
 # Set up the database and models
 require APP_ROOT.join('config', 'database')
+
+CarrierWave.configure do |config|
+  config.store_dir = 'uploads'
+  config.root = APP_ROOT.join('public')
+end

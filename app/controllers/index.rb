@@ -1,5 +1,5 @@
 before do
-  @inspiration ||= "'What a beautiful day'"
+  @inspiration = Inspiration.find(1)
 end
 
 
@@ -7,13 +7,29 @@ get '/' do
   erb :index
 end
 
+get 'request' do
 
-get '/user/:id' do 
-  @user = User.find(params[:id])
+
+end
+
+get '/inspiration/:id' do 
+  @inspiration = Inspiration.find(params[:id])
+  session[:inspiration_id => params[:id]]
   erb :show_inspiration
 end
 
-post 'upload_image' do
-  @image = Image.create(parms[:image])
-
+post '/photos' do
+  photo = Photo.new
+  puts params
+  photo.representation = params[:image]
+  photo.save
+  @inspiration.photos << photo
+  redirect '/inspiration'
 end
+
+get '/inspiration' do 
+  puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+  @photos = @inspiration.photos
+  erb :voting_wall
+end
+
